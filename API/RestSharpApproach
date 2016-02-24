@@ -1,0 +1,71 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using RestSharp;
+using System.Net.Http;
+using System.Net.Http.Headers;
+//using RestSharp.Newtonsoft.Json;
+
+
+
+namespace ClassToJsonNewton
+{
+
+    class SimpleAPI
+    {
+
+        [JsonProperty("apiKey")]
+        public string ApiKey { get; set; }
+        [JsonProperty("lang")]
+        public string Lang { get; set; }
+        [JsonProperty("company_account_id")]
+        public string CompanyAccountId { get; set; }
+        [JsonProperty("name")]
+        public string Name { get; set; }
+        public SimpleAPI(string _apiKey, string _lang, string _company_account_id,
+                        string _name)
+        {
+            this.ApiKey = _apiKey;
+            this.Lang = _lang;
+            this.CompanyAccountId = _company_account_id;
+            this.Name = _name;
+        }
+       
+    }
+
+    class Program
+    {
+        
+
+        static void Main(string[] args)
+        {
+            SimpleAPI testApi = new SimpleAPI("x", "xg", "xk", "x");
+            string json = JsonConvert.SerializeObject(testApi, Formatting.Indented);
+            Console.WriteLine("Obtained JSON: " + json.ToString());
+
+            var client = new RestClient();
+            client.BaseUrl = new Uri("https://atlasrk.scoro.lv");
+
+            //2 variant combained RestSharp+NewtonSoft.
+            //var request = new RestSharp.Newtonsoft.Json.RestRequest(Method.POST);
+            //request.JsonSerializer = new NewtonsoftJsonSerializer();
+
+            //1 variant plain RestSharp;
+            var request = new RestRequest(Method.POST);
+            request.Resource = "api/contacts";
+            request.AddParameter("application/json", json, ParameterType.RequestBody);
+            
+            //both requests work Obj or String don't know how.
+            //request.AddBody(json);
+            request.AddBody(testApi);
+
+            IRestResponse response = client.Execute(request);
+            Console.WriteLine("response: " + response.Content);
+            
+            Console.ReadKey();
+        }
+    }
+}
