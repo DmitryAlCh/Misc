@@ -1,0 +1,65 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using RestSharp;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using RestSharp.Newtonsoft.Json;
+
+
+
+namespace ClassToJsonNewton
+{
+
+    class SimpleAPI
+    {
+
+        [JsonProperty("apiKey")]
+        public string ApiKey { get; set; }
+        [JsonProperty("lang")]
+        public string Lang { get; set; }
+        [JsonProperty("company_account_id")]
+        public string CompanyAccountId { get; set; }
+        [JsonProperty("name")]
+        public string Name { get; set; }
+        public SimpleAPI(string _apiKey, string _lang, string _company_account_id,
+                        string _name)
+        {
+            this.ApiKey = _apiKey;
+            this.Lang = _lang;
+            this.CompanyAccountId = _company_account_id;
+            this.Name = _name;
+        }
+       
+    }
+
+    class Program
+    {
+        private static void SetJsonContetnt(RestSharp.Newtonsoft.Json.RestRequest request,Object obj)
+        {
+            request.RequestFormat = DataFormat.Json;
+            request.JsonSerializer = new RestSharp.Newtonsoft.Json.NewtonsoftJsonSerializer();
+            request.AddBody(obj);
+        }
+
+        static void Main(string[] args)
+        {
+            SimpleAPI testApi = new SimpleAPI("");
+
+            var client = new RestClient();
+            client.BaseUrl = new Uri("https://atlasrk.scoro.lv");
+                       
+            var request = new RestSharp.Newtonsoft.Json.RestRequest(Method.POST);
+            request.Resource = "Api/Contacts";
+            SetJsonContetnt(request,testApi);
+         
+            IRestResponse response = client.Execute(request);
+            Console.WriteLine("response: " + response.Content);
+            
+            Console.ReadKey();
+        }
+    }
+}
